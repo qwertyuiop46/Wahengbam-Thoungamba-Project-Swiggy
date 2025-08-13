@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Swiggy Lite — HTML/CSS Clone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0f172a;
+      --muted:#5b6474;
+      --panel:#ffffff;
+      --surface:#f6f7fb;
+      --border:#e6e8ef;
+      --accent:#fc8019; /* Swiggy-ish orange */
+      --green:#22c55e;
+      --star:#f59e0b;
+      --danger:#ef4444;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0f1115; --text:#e9eefb; --muted:#a8b3cf; --panel:#141826; --surface:#0f1320; --border:#273050;
+      }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    img{max-width:100%;display:block}
+    a{color:inherit;text-decoration:none}
+    button{font:inherit}
+
+    /* ===== Layout ===== */
+    .app{min-height:100dvh;display:grid;grid-template-rows:auto auto 1fr auto}
+    .container{max-width:1120px;margin:0 auto;padding:0 20px}
+
+    /* ===== Top Bar ===== */
+    .top{
+      position:sticky;top:0;z-index:60;background:var(--panel);
+      border-bottom:1px solid var(--border);
+    }
+    .bar{display:flex;align-items:center;gap:14px;padding:10px 0}
+    .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px}
+    .logo{width:28px;height:28px;border-radius:6px;background:var(--accent);display:grid;place-items:center;color:#fff;font-weight:800}
+    .loc{display:flex;align-items:center;gap:8px;color:var(--muted)}
+    .loc b{color:var(--text)}
+    .search{flex:1;max-width:520px}
+    .search .wrap{position:relative}
+    .search input{width:100%;padding:11px 12px 11px 38px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);outline:none}
+    .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.65}
+    .cta{display:flex;gap:8px}
+    .btn{padding:10px 12px;border:1px solid var(--border);background:var(--panel);border-radius:10px}
+    .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+
+    /* ===== Hero ===== */
+    .hero{background:linear-gradient(180deg,var(--surface),transparent);border-bottom:1px solid var(--border)}
+    .hero .row{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center;padding:26px 0}
+    .hero h1{font-size:28px;line-height:1.1;margin:0 0 8px}
+    .hero p{color:var(--muted);margin:0 0 16px}
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{padding:8px 10px;border:1px dashed var(--border);border-radius:999px;background:var(--panel)}
+    .hero .art{aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+    .hero .art img{width:100%;height:100%;object-fit:cover}
+
+    /* ===== Filters ===== */
+    .filters{position:sticky;top:62px;z-index:50;background:var(--panel);border-bottom:1px solid var(--border)}
+    .filters .row{display:flex;gap:10px;overflow:auto;padding:12px 0}
+    .pill{padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface);white-space:nowrap}
+    .pill.active{border-color:var(--accent)}
+
+    /* ===== Cards ===== */
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:18px 0 26px}
+    @media (max-width: 960px){ .hero .row{grid-template-columns:1fr} .grid{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width: 620px){ .grid{grid-template-columns:1fr} .loc{display:none} }
+
+    .card{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--panel);display:flex;flex-direction:column}
+    .thumb{aspect-ratio:16/10;background:var(--surface);position:relative}
+    .badge{position:absolute;left:10px;top:10px;background:#000000a8;color:#fff;padding:6px 8px;border-radius:999px;font-size:12px}
+    .off{position:absolute;right:10px;bottom:10px;background:var(--accent);color:#fff;padding:6px 8px;border-radius:8px;font-weight:600;font-size:12px}
+    .body{padding:12px}
+    .title{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .title h3{font-size:16px;margin:0}
+    .rating{display:flex;align-items:center;gap:6px;font-weight:600}
+    .rating .star{color:var(--star)}
+    .meta{color:var(--muted);font-size:12px;margin:6px 0 10px}
+    .tags{display:flex;gap:6px;flex-wrap:wrap}
+    .tag{font-size:11px;padding:6px 8px;border:1px solid var(--border);border-radius:999px;background:var(--surface)}
+    .footer{margin-top:auto;padding:12px;border-top:1px dashed var(--border);display:flex;justify-content:space-between;align-items:center}
+    .veg{width:12px;height:12px;border:1.5px solid var(--green);border-radius:2px;display:inline-grid;place-items:center}
+    .veg::after{content:"";width:7px;height:7px;background:var(--green);border-radius:1px}
+    .nonveg{width:12px;height:12px;border:1.5px solid var(--danger);border-radius:2px;display:inline-grid;place-items:center}
+    .nonveg::after{content:"";width:7px;height:7px;background:var(--danger);border-radius:1px}
+
+    /* ===== Sticky Cart Bar (mobile-first) ===== */
+    .cartbar{position:sticky;bottom:0;z-index:70;background:var(--panel);border-top:1px solid var(--border)}
+    .cartbar .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
+    .cartbar .summary{display:flex;align-items:center;gap:10px}
+    .cartbar .go{padding:10px 14px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-weight:700}
+
+    /* ===== Bottom Nav (mobile) ===== */
+    .bottomnav{display:none;position:sticky;bottom:0;background:var(--panel);border-top:1px solid var(--border);z-index:80}
+    .bottomnav .tabs{display:grid;grid-template-columns:repeat(4,1fr)}
+    .bottomnav a{padding:10px 6px;text-align:center;color:var(--muted);font-size:12px}
+    .bottomnav a b{display:block;color:var(--text)}
+    @media (max-width: 860px){ .bottomnav{display:block} }
+
+    /* ===== Site Footer ===== */
+    .sitefoot{border-top:1px solid var(--border);padding:24px 0 40px;color:var(--muted);text-align:center}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Top Bar -->
+    <div class="top">
+      <div class="container bar">
+        <div class="brand">
+          <div class="logo">S</div>
+          Swiggy <span style="font-weight:400">Lite</span>
+        </div>
+        <div class="loc" aria-label="Delivery location">
+          📍 <b>Imphal Manipur</b> · <span>Now</span>
+        </div>
+        <div class="search">
+          <div class="wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20L17 17"/></svg>
+            <input placeholder="Search for restaurants, dishes" aria-label="Search"/>
+          </div>
+        </div>
+        <div class="cta">
+          <button class="btn">Login</button>
+          <button class="btn primary">Sign up</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container row">
+        <div>
+          <h1>Hungry? Order from top restaurants near you.</h1>
+          <p>Fast delivery • Live order tracking • No minimum order</p>
+          <div class="chips">
+            <span class="chip">🍕 Pizza</span>
+            <span class="chip">🍔 Burgers</span>
+            <span class="chip">🥗 Healthy</span>
+            <span class="chip">🍜 Noodles</span>
+            <span class="chip">🧁 Desserts</span>
+          </div>
+        </div>
+        <div class="art">
+          <img src="https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?q=80&w=1200&auto=format&fit=crop" alt="Food collage"/>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters -->
+    <nav class="filters" aria-label="Filters">
+      <div class="container row">
+        <a class="pill active" href="#">Fast Delivery</a>
+        <a class="pill" href="#">Ratings 4.0+</a>
+        <a class="pill" href="#">Pure Veg</a>
+        <a class="pill" href="#">Offers</a>
+        <a class="pill" href="#">₹300-₹600</a>
+        <a class="pill" href="#">New on Swiggy</a>
+        <a class="pill" href="#">Cuisines</a>
+      </div>
+    </nav>
+
+    <!-- Restaurant Grid -->
+    <main class="container">
+      <div class="grid" aria-label="Restaurants">
+        <!-- Card 1 -->
+        <article class="card">
+          <div class="thumb">
+            <img src="https://picsum.photos/seed/biryani/800/500" alt="Biryani House" style="width:100%;height:100%;object-fit:cover">
+            <div class="badge">30-35 mins</div>
+            <div class="off">50% OFF up to ₹100</div>
+          </div>
+          <div class="body">
+            <div class="title">
+              <h3>Biryani House</h3>
+              <div class="rating"><span class="star">★</span>4.4</div>
+            </div>
+            <div class="meta">Biryani, Kebabs • ₹₹ • 2.1 km</div>
+            <div class="tags"><span class="tag">Popular near you</span><span class="tag">Spicy</span></div>
+          </div>
+          <div class="footer"><span class="veg" title="Veg"></span> &nbsp; Both options • ₹250 for one <button class="btn" style="margin-left:auto">View menu</button></div>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="card">
+          <div class="thumb">
+            <img src="https://picsum.photos/seed/pizza/800/500" alt="OvenFresh Pizza" style="width:100%;height:100%;object-fit:cover">
+            <div class="badge">20-25 mins</div>
+            <div class="off">ITEMS @ ₹99</div>
+          </div>
+          <div class="body">
+            <div class="title">
+              <h3>OvenFresh Pizza</h3>
+              <div class="rating"><span class="star">★</span>4.2</div>
+            </div>
+            <div class="meta">Pizza, Pasta • ₹₹ • 1.2 km</div>
+            <div class="tags"><span class="tag">Super Saver</span><span class="tag">Cheesy</span></div>
+          </div>
+          <div class="footer"><span class="nonveg" title="Non-Veg"></span> &nbsp; Both options • ₹300 for one <button class="btn" style="margin-left:auto">View menu</button></div>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="card">
+          <div class="thumb">
+            <img src="https://picsum.photos/seed/salad/800/500" alt="Green Bowl" style="width:100%;height:100%;object-fit:cover">
+            <div class="badge">25–30 mins</div>
+            <div class="off">Free Delivery</div>
+          </div>
+          <div class="body">
+            <div class="title">
+              <h3>Green Bowl</h3>
+              <div class="rating"><span class="star">★</span>4.6</div>
+            </div>
+            <div class="meta">Salads, Healthy • ₹₹ • 3.5 km</div>
+            <div class="tags"><span class="tag">Pure Veg</span><span class="tag">High Protein</span></div>
+          </div>
+          <div class="footer"><span class="veg" title="Veg"></span> &nbsp; Veg only • ₹240 for one <button class="btn" style="margin-left:auto">View menu</button></div>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="card">
+          <div class="thumb">
+            <img src="https://picsum.photos/seed/momos/800/500" alt="Momo Junction" style="width:100%;height:100%;object-fit:cover">
+            <div class="badge">18–22 mins</div>
+            <div class="off">30% OFF</div>
+          </div>
+          <div class="body">
+            <div class="title">
+              <h3>Momo Junction</h3>
+              <div class="rating"><span class="star">★</span>4.1</div>
+            </div>
+            <div class="meta">Momos, Chinese • ₹ • 0.9 km</div>
+            <div class="tags"><span class="tag">New</span><span class="tag">Pocket Friendly</span></div>
+          </div>
+          <div class="footer"><span class="nonveg" title="Non-Veg"></span> &nbsp; Both options • ₹150 for one <button class="btn" style="margin-left:auto">View menu</button></div>
+        </article>
+
+        <!-- Card 5 -->
+        <article class="card">
+          <div class="thumb">
+            <img src="https://picsum.photos/seed/dessert/800/500" alt="Sugar Rush" style="width:100%;height:100%;object-fit:cover">
+            <div class="badge">35–40 mins</div>
+            <div class="off">Buy 1 Get 1</div>
+          </div>
+          <div class="body">
+            <div class="title">
+              <h3>Sugar Rush</h3>
+              <div class="rating"><span class="star">★</span>4.8</div>
+            </div>
+            <div class="meta">Desserts, Bakery • ₹₹ • 4.8 km</div>
+            <div class="tags"><span class="tag">Premium</span><span class="tag">Cakes</span></div>
+          </div>
+          <div class="footer"><span class="veg" title="Veg"></span> &nbsp; Veg only • ₹200 for one <button class="btn" style="margin-left:auto">View menu</button></div>
+        </article>
+
+        <!-- Card 6 -->
+        <article class="card">
+          <div class="thumb">
+            <img src="https://picsum.photos/seed/thali/800/500" alt="Desi Tadka" style="width:100%;height:100%;object-fit:cover">
+            <div class="badge">28–32 mins</div>
+            <div class="off">Up to ₹120 OFF</div>
+          </div>
+          <div class="body">
+            <div class="title">
+              <h3>Desi Tadka</h3>
+              <div class="rating"><span class="star">★</span>4.0</div>
+            </div>
+            <div class="meta">North Indian, Thalis • ₹ • 2.9 km</div>
+            <div class="tags"><span class="tag">Budget</span><span class="tag">Family</span></div>
+          </div>
+          <div class="footer"><span class="veg" title="Veg"></span> &nbsp; Both options • ₹180 for one <button class="btn" style="margin-left:auto">View menu</button></div>
+        </article>
+      </div>
+    </main>
+
+    <!-- Sticky Cart Bar -->
+    <div class="cartbar">
+      <div class="container row">
+        <div class="summary">🛒 <b>0 items</b> · ₹0</div>
+        <button class="go">View Cart</button>
+      </div>
+    </div>
+
+    <!-- Bottom Tabs (mobile) -->
+    <nav class="bottomnav" aria-label="Bottom Navigation">
+      <div class="tabs">
+        <a href="#"><b>🏠</b>Home</a>
+        <a href="#"><b>🔎</b>Search</a>
+        <a href="#"><b>🛒</b>Cart</a>
+        <a href="#"><b>👤</b>Account</a>
+      </div>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="sitefoot">
+      <div class="container">
+        <small>Educational UI • Swiggy-inspired, not affiliated. © 2025</small>
+        <div style="margin-top:8px;font-size:12px">
+          <a href="#">About</a> · <a href="#">Help</a> · <a href="#">Privacy</a> · <a href="#">Terms</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
